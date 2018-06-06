@@ -95,7 +95,7 @@ for(i in 1:nrow(data.combined)) {
 data.combined$Title2 <- sapply(data.combined$Name, extractTitle)
 
 #since we have surviver labels on the train dataframe we only use those rows belong to train 
-
+library(ggplot2)
 ggplot(data.combined[1:891,], aes(x = Title, fill = Survived)) +
     geom_bar(width = 0.9) +
     facet_wrap(~Pclass) +
@@ -104,3 +104,26 @@ ggplot(data.combined[1:891,], aes(x = Title, fill = Survived)) +
     ylab("Total Count") +
     labs(fill = "Survived")
 ?facet_wrap
+
+#age and sex pretty important so we look at the distribution of them
+
+table(data.combined$Sex)
+ggplot(data.combined[1:891,], aes(x= Sex, fill = Survived)) +
+      geom_bar(width = 0.5) +
+      facet_wrap(~Pclass) +
+      ggtitle("Pclass") +
+      xlab("Sex") +
+      ylab("Total Count") +
+      labs(fill = "Survived")
+summary(data.combined$Age)
+#age distribution
+ggplot(data.combined[1:891,], aes(x= Age, fill = Survived)) +
+  facet_wrap(~Sex + Pclass) +
+  geom_bar(width = 10) +
+  ggtitle("Pclass") +
+  xlab("Age") +
+  ylab("Total Count")
+
+#hypothesis - "Master." is a goo proxy for male children
+boys <- data.combined[which(data.combined$Title == "Master."),]
+summary(boys$Age)
