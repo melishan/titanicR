@@ -117,13 +117,131 @@ ggplot(data.combined[1:891,], aes(x= Sex, fill = Survived)) +
       labs(fill = "Survived")
 summary(data.combined$Age)
 #age distribution
-ggplot(data.combined[1:891,], aes(x= Age, fill = Survived)) +
+library(ggplot2)
+ggplot(data.combined[1:891,], aes(x = Age, fill = Survived)) +
   facet_wrap(~Sex + Pclass) +
-  geom_bar(width = 10) +
-  ggtitle("Pclass") +
+  geom_histogram(binwidth = 10) +
   xlab("Age") +
   ylab("Total Count")
 
 #hypothesis - "Master." is a goo proxy for male children
 boys <- data.combined[which(data.combined$Title == "Master."),]
 summary(boys$Age)
+
+summary
+
+#age for misses by Pclass
+ggplot(misses[misses$Survived != "None",], aes(x = Age, fill = Survived)) +
+  facet_wrap(~Pclass) +
+  geom_histogram(binwidth = 5) +
+  xlab("Age") +
+  ylab("Total Count")
+
+#female children have different survical rates
+#we will create dataset to catch a pattern in female children who travel alone.
+
+misses.alone <- misses[which(misses$SibSp == 0 & misses$Parch == 0),]
+summary(misses.alone$Age)
+
+#the reason to ook at age 14.5 is to make equal analysis for both female and male children. 
+#Male children in boys data.frame shows that max age of boys is 14.5
+length(which(misses.alone$Age <= 14.5))
+
+#summary of SibSp variable
+summary(data.combined$SibSp)
+?unique
+
+#with this method you can see how many level we have. its usage similar with factor.
+length(unique(data.combined$SibSp))
+
+data.combined$SibSp <- as.factor(data.combined$SibSp)
+is.factor(data.combined$SibSp)
+library(ggplot2)
+ggplot(data.combined[1:891,], aes(x = as.numeric(SibSp), fill = Survived)) +
+  facet_wrap(~Pclass + Title) +
+  geom_histogram(binwidth = 1) +
+  ggtitle("Pclass, Title")
+  xlab("SibSp") +
+  ylab("Total Count") +
+  ylim(0,300) +
+  labs(fill = "Survived")
+
+#to see distribution parch variable
+  
+ggplot(data.combined[1:891,], aes(x = Parch, fill = Survived)) +
+    facet_wrap(~Pclass + Title) +
+    geom_histogram(binwidth = 1) +
+    ggtitle("Pclass, Title")
+  xlab("Parch") +
+    ylab("Total Count") +
+    ylim(0,300) +
+    labs(fill = "Survived")
+  
+#to examine correlation between family size and survival rate
+temp.sibSp <- c(train$SibSp, test$SibSp)
+temp.Parch <- c(train$Parch, test$Parch)
+  
+data.combined$familySize <- (temp.Parch + temp.sibSp + 1)
+  
+ggplot(data.combined[1:891,], aes(x = as.integer(familySize), fill = Survived)) +
+facet_wrap(~Pclass + Title) +
+geom_histogram(binwidth = 1) +
+ggtitle("Pclass, Title")
+xlab("familySize") +
+ylab("Total Count") +
+ylim(0,300) +
+labs(fill = "Survived")
+
+str(data.combined$Parch)
+str(data.combined$familySize)
+
+#look at the other variables; ticket, cabin.
+str(data.combined$Ticket)
+
+#based on the huge number of levels make ticket variable string
+data.combined$Ticket <- as.character(data.combined$Ticket)
+str(data.combined$Ticket)
+data.combined$Ticket[1:10]
+
+#it seems ticket number has lots of variant. So, we can look at the first character of ticket to try to get any patter from it.
+
+?substr
+?ifelse
+#we obtain a new vector which includes only first letter of ticket variable.
+#we also took precaution to see empty characters too. However, there is no empty row in ticket variable.
+firstchar_ticket <- ifelse(data.combined$Ticket == "", " ", substr(data.combined$Ticket, 1, 1))
+unique(firstchar_ticket)
+
+data.combined$firstchar_ticket <- as.factor(firstchar_ticket)
+str(data.combined$firstchar_ticket)
+library(ggplot2)
+#lets have a look at the title via ggplot
+ggplot(data.combined[1:891,], aes(x = firstchar_ticket, fill = Survived)) +
+  geom_bar() +
+  ggtitle("Survival rate of ticket type")
+xlab("ticket") +
+  ylab("Total Count") +
+  ylim(0,300) +
+  labs(fill = "Survived")
+
+#drill down ticket variable a bit
+ggplot(data.combined[1:891,], aes(x = firstchar_ticket, fill = Survived)) +
+  facet_wrap(~Pclass) +
+  geom_bar() +
+  ggtitle("Pclass") +
+  xlab("ticket") +
+  ylab("Total Count") +
+  ylim(0,300) +
+  labs(fill = "Survived")
+  
+#combining ticket with titles
+#there is no clear pattern in ticket names
+ggplot(data.combined[1:891,], aes(x = firstchar_ticket, fill = Survived)) +
+  facet_wrap(~Pclass + Title) +
+  geom_bar() +
+  ggtitle("Pclass & Title")
+  xlab("ticket") +
+  ylab("Total Count") +
+  ylim(0,300) +
+  labs(fill = "Survived")
+  
