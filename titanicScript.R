@@ -245,3 +245,97 @@ ggplot(data.combined[1:891,], aes(x = firstchar_ticket, fill = Survived)) +
   ylim(0,300) +
   labs(fill = "Survived")
   
+#to catch pattern with fare variable
+summary(data.combined$Fare)
+length(unique(data.combined$Fare))
+
+#can't make fare a factor, trat as numeric and visualize it via histogram
+ggplot(data.combined, aes(x = Fare)) +
+  geom_histogram(binwidth = 5) +
+  ggtitle("Fare Distribution")
+  xlab("Fare") +
+  ylab("Total Count") +
+  ylim(0,300)
+
+#to catch pattern with fare variable to develop predictive model
+ggplot(data.combined[1:891,], aes(x = Fare, fill = Survived)) +
+  facet_wrap(~Pclass + Title) +
+  geom_histogram(binwidth = 5) +
+  ggtitle("Pclass & Title")
+  xlab("Fare") +
+  ylab("Total Count") +
+  ylim(0, 50) +
+  labs(fill = "Survived")
+  
+str(data.combined$Fare)
+
+#Analysis of the cabin variable
+str(data.combined$Cabin)
+head(data.combined$Cabin, 5)
+data.combined[!complete.cases(data.combined$Cabin),]
+
+#convert cabin variable to string 
+data.combined$Cabin <- as.character(data.combined$Cabin)
+data.combined$Cabin[1:100]
+
+#replace missing data in cabin variable - U for unknown
+data.combined[which(data.combined$Cabin ==""), "Cabin"] <- "U"
+data.combined$Cabin[1:100]
+
+#take a look at just the first character as factor
+firstchar_cabin <- substr(data.combined$Cabin, 1, 1)
+data.combined$firstchar_cabin <- as.factor(firstchar_cabin)
+str(data.combined$firstchar_cabin)
+
+#visualize the first char cabin variable 
+ggplot(data.combined[1:891,], aes(x = firstchar_cabin, fill = Survived)) +
+  geom_bar() +
+  xlab("Cabin") +
+  ylab("Total Count") +
+  ylim(0, 750) +
+  labs(fill = "Survived")
+
+#Drill in
+ggplot(data.combined[1:891,], aes(x = firstchar_cabin, fill = Survived)) +
+  geom_bar() +
+  facet_wrap(~Pclass)
+  ggtitle("Pclass")
+  xlab("Cabin") +
+  ylab("Total Count") +
+  ylim(0, 750) +
+  labs(fill = "Survived")
+  
+
+#add title too
+ggplot(data.combined[1:891,], aes(x = firstchar_cabin, fill = Survived)) +
+  geom_bar() +
+  facet_wrap(~Pclass + Title) +
+  ggtitle("Pclass & Title")
+  xlab("Cabin") +
+  ylab("Total Count") +
+  ylim(0, 300) +
+  labs(fill = "Survived")  
+  
+#multiple cabins
+install.packages("stringr")
+library(stringr)
+data.combined$cabin_multipled <- as.factor(ifelse(str_detect(data.combined$Cabin, " "), "Y" ,"N"))
+
+ggplot(data.combined[1:891,], aes(x = cabin_multipled, fill = Survived)) +
+  geom_bar() +
+  facet_wrap(~Pclass + Title) +
+  ggtitle("Pclass + Title")
+  xlab("Cabin") +
+  ylab("Total Count") +
+  ylim(0, 300) +
+  labs(fill = "Survived")
+  
+#Analysis of the embarked variable
+ggplot(data.combined[1:891,], aes(x = Embarked, fill = Survived)) +
+  geom_bar() +
+  facet_wrap(~Pclass + Title) +
+  ggtitle("Pclass & Title")
+  xlab("Embarked") +
+  ylab("Total Count") +
+  ylim(0, 750) +
+  labs(fill = "Survived")
